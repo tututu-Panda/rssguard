@@ -11,43 +11,19 @@ env:
   ACTIONS_STEP_DEBUG: true
 
 jobs:
-  check-build-script:
-    name: check-build-script
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-
-      - name: Check script syntax
-        run: bash -n ./resources/scripts/github-actions/build-linux-mac.sh
-
-      - name: Show shellcheck version
-        run: shellcheck --version
-
-      - name: Run shellcheck
-        run: shellcheck --color=always ./resources/scripts/github-actions/build-linux-mac.sh
 
   build-rssguard:
-    needs: check-build-script
     name: "${{ matrix.os }}; no-lite = ${{ matrix.no_lite }}; qt5 = ${{ matrix.use_qt5 }}"
     runs-on: "${{ matrix.os }}"
     strategy:
       matrix:
-        os: [windows-2022, ubuntu-24.04, macos-13]
+        os: [windows-2022]
         no_lite: ["ON", "OFF"]
         use_qt5: ["ON", "OFF"]
         include:
           - os: windows-2022
             script_name: .\resources\scripts\github-actions\build-windows.ps1
-          - os: ubuntu-24.04
-            script_name: ./resources/scripts/github-actions/build-linux-mac.sh
-          - os: macos-13
-            script_name: ./resources/scripts/github-actions/build-linux-mac.sh
-        exclude:
-          - os: ubuntu-24.04
-            use_qt5: "ON"
-          - os: macos-13
-            use_qt5: "ON"
+        exclude: []
     steps:         
       - name: Checkout source code
         uses: actions/checkout@v4
@@ -69,8 +45,6 @@ jobs:
           path: |
             ./rssguard-build/rssguard-*win*.exe
             ./rssguard-build/rssguard-*win*.7z
-            ./rssguard-build/rssguard-*mac64.dmg
-            ./rssguard-build/rssguard-*linux64.AppImage
 
   dist-binaries:
     name: distribute-binaries
